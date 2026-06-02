@@ -4,6 +4,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.spongepowered.asm.launch.MixinBootstrap;
 import zone.rong.mixinbooter.IEarlyMixinLoader;
+import zone.rong.mixinbooter.ILateMixinLoader;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -11,39 +12,36 @@ import java.util.List;
 import java.util.Map;
 
 @IFMLLoadingPlugin.MCVersion("1.12.2")
-@IFMLLoadingPlugin.SortingIndex(1001) // 确保早期加载
-public class NoiseThreaderPlugin implements IFMLLoadingPlugin, IEarlyMixinLoader {
+@IFMLLoadingPlugin.SortingIndex(1001)
+public class NoiseThreaderPlugin implements IFMLLoadingPlugin, IEarlyMixinLoader, ILateMixinLoader {
 
     public NoiseThreaderPlugin() {
-        // 初始化 Mixin 系统
         MixinBootstrap.init();
     }
 
+    // 早期 Mixin：不依赖其他模组，可以早期加载
     @Override
     public List<String> getMixinConfigs() {
         List<String> configs = new ArrayList<>();
-
-        // 1. 原版噪声优化（始终启用）
         configs.add("mixins.noisethreader.vanilla.json");
+        return configs;
+    }
 
-        // 2. 原版缓存线程安全（仅在 BetterCaves 存在时启用）
+    // 晚期 Mixin：依赖其他模组，等模组加载完成后再加载
+    @Override
+    public List<String> getLateMixinConfigs() {
+        List<String> configs = new ArrayList<>();
+
         if (Loader.isModLoaded("bettercaves")) {
             configs.add("mixins.noisethreader.vanilla.cache.json");
+            configs.add("mixins.noisethreader.bettercaves.json");
         }
 
-        // 3. OTG 噪声优化（仅在 OTG 存在时启用）
         if (Loader.isModLoaded("openterraingenerator")) {
             configs.add("mixins.noisethreader.otg.json");
-            
-            // OTG 缓存（需要同时有 BetterCaves）
             if (Loader.isModLoaded("bettercaves")) {
                 configs.add("mixins.noisethreader.otg.cache.json");
             }
-        }
-
-        // 4. BetterCaves 优化（仅在 BetterCaves 存在时启用）
-        if (Loader.isModLoaded("bettercaves")) {
-            configs.add("mixins.noisethreader.bettercaves.json");
         }
 
         return configs;
@@ -66,9 +64,7 @@ public class NoiseThreaderPlugin implements IFMLLoadingPlugin, IEarlyMixinLoader
     }
 
     @Override
-    public void injectData(Map<String, Object> data) {
-        // 不需要额外处理
-    }
+    public void injectData(Map<String, Object> data) { }
 
     @Override
     public String getAccessTransformerClass() {
