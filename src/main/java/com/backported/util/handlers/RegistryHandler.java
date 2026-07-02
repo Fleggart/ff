@@ -9,25 +9,27 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 @EventBusSubscriber
 public class RegistryHandler {
+
    @SubscribeEvent
    public static void onItemRegister(RegistryEvent.Register<Item> event) {
-      event.getRegistry().registerAll((IForgeRegistryEntry[])ModItems.ITEMS.toArray(new Item[0]));
+      // 直接传入 Item 数组，不需要强制转换
+      event.getRegistry().registerAll(ModItems.ITEMS.toArray(new Item[0]));
    }
 
    @SubscribeEvent
    public static void onBlockRegister(RegistryEvent.Register<Block> event) {
-      event.getRegistry().registerAll((IForgeRegistryEntry[])ModBlocks.BLOCKS.toArray(new Block[0]));
+      // 直接传入 Block 数组，不需要强制转换
+      event.getRegistry().registerAll(ModBlocks.BLOCKS.toArray(new Block[0]));
    }
 
    @SubscribeEvent
    public static void onModelRegister(ModelRegistryEvent event) {
-      for(Item item : ModItems.ITEMS) {
+      for (Item item : ModItems.ITEMS) {
          Base.proxy.registerItemRenderer(item, 0, "inventory");
       }
-
    }
+
 }
