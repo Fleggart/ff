@@ -29,6 +29,26 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
 
+    - name: Verify project files
+      run: |
+        echo "===== Current directory ====="
+        pwd
+
+        echo "===== Repository root ====="
+        ls -la
+
+        echo "===== src/main/resources ====="
+        ls -la src/main/resources || true
+
+        echo "===== META-INF ====="
+        ls -la src/main/resources/META-INF || true
+
+        echo "===== Find futuremc ====="
+        find . -iname "*futuremc*"
+
+        echo "===== Git tracked files ====="
+        git ls-files | grep -i futuremc || true
+
     - name: Build with Gradle
       run: ./gradlew build
 
@@ -37,4 +57,3 @@ jobs:
       with:
         name: mod-build
         path: build/libs/*.jar
-
