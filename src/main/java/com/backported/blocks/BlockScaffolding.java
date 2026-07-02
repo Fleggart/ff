@@ -293,7 +293,7 @@ public class BlockScaffolding extends Block {
                return false;
             } else if (worldIn.func_180495_p(pos.func_177977_b()).func_177230_c() == Blocks.field_150350_a && (double)hitY <= (double)0.125F && (double)hitX >= (double)0.125F && (double)hitZ >= (double)0.125F && (double)hitX <= (double)0.875F && (double)hitZ <= (double)0.875F) {
                pos = pos.func_177977_b();
-               AxisAlignedBB aabb = (new AxisAlignedBB(pos)).func_186662_g(0.1);
+               AxisAlignedBB aabb = (new AxisAlignedBB(pos)).grow(0.1);
 
                for(EntityFallingBlock entity : worldIn.func_72872_a(EntityFallingBlock.class, aabb)) {
                   if (entity.func_180425_c().equals(pos)) {
@@ -341,7 +341,7 @@ public class BlockScaffolding extends Block {
                }
 
                if (worldIn.func_180495_p(pos).func_177230_c() == Blocks.field_150350_a) {
-                  AxisAlignedBB aabb = (new AxisAlignedBB(pos)).func_186662_g(0.1);
+                  AxisAlignedBB aabb = (new AxisAlignedBB(pos)).grow(0.1);
 
                   for(EntityFallingBlock entity : worldIn.func_72872_a(EntityFallingBlock.class, aabb)) {
                      if (entity.func_180425_c().equals(pos)) {
