@@ -10,4 +10,3 @@ public class FuelHandler implements IFuelHandler {
       return fuel.func_77973_b() == Item.func_150898_a(ModBlocks.SCAFFOLDING) ? 50 : 0;
    }
 }
-
