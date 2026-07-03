@@ -39,351 +39,330 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 public class BlockScaffolding extends Block {
-   public static final PropertyInteger DISTANCE = PropertyInteger.func_177719_a("distance", 0, 7);
-   public static final PropertyBool BOTTOM = PropertyBool.func_177716_a("bottom");
-   protected static final AxisAlignedBB COLLISION_BOX = new AxisAlignedBB((double)0.0F, (double)0.875F, (double)0.0F, (double)1.0F, (double)1.0F, (double)1.0F);
-   protected static final AxisAlignedBB COLLISION_BOX_BOTTOM = new AxisAlignedBB((double)0.0F, (double)0.0F, (double)0.0F, (double)1.0F, (double)0.125F, (double)1.0F);
-   protected static final AxisAlignedBB LEG_BL = new AxisAlignedBB((double)0.0F, (double)0.0F, (double)0.0F, (double)0.125F, (double)1.0F, (double)0.125F);
-   protected static final AxisAlignedBB LEG_BR = new AxisAlignedBB((double)0.875F, (double)0.0F, (double)0.0F, (double)1.0F, (double)1.0F, (double)0.125F);
-   protected static final AxisAlignedBB LEG_FL = new AxisAlignedBB((double)0.0F, (double)0.0F, (double)0.875F, (double)0.125F, (double)1.0F, (double)1.0F);
-   protected static final AxisAlignedBB LEG_FR = new AxisAlignedBB((double)0.875F, (double)0.0F, (double)0.875F, (double)1.0F, (double)1.0F, (double)1.0F);
+    public static final PropertyInteger DISTANCE = PropertyInteger.create("distance", 0, 7);
+    public static final PropertyBool BOTTOM = PropertyBool.create("bottom");
+    protected static final AxisAlignedBB COLLISION_BOX = new AxisAlignedBB(0.0F, 0.875F, 0.0F, 1.0F, 1.0F, 1.0F);
+    protected static final AxisAlignedBB COLLISION_BOX_BOTTOM = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 0.125F, 1.0F);
+    protected static final AxisAlignedBB LEG_BL = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 0.125F, 1.0F, 0.125F);
+    protected static final AxisAlignedBB LEG_BR = new AxisAlignedBB(0.875F, 0.0F, 0.0F, 1.0F, 1.0F, 0.125F);
+    protected static final AxisAlignedBB LEG_FL = new AxisAlignedBB(0.0F, 0.0F, 0.875F, 0.125F, 1.0F, 1.0F);
+    protected static final AxisAlignedBB LEG_FR = new AxisAlignedBB(0.875F, 0.0F, 0.875F, 1.0F, 1.0F, 1.0F);
 
-   public BlockScaffolding() {
-      super(Material.field_151575_d);
-      this.func_149663_c("scaffolding");
-      this.setRegistryName("backported", "scaffolding");
-      this.func_149711_c(0.0F);
-      this.func_149752_b(0.0F);
-      this.func_149672_a(SoundType.field_185848_a);
-      this.func_149713_g(0);
-      this.func_149647_a(CreativeTabs.field_78031_c);
-      this.func_180632_j(this.field_176227_L.func_177621_b().func_177226_a(DISTANCE, 0).func_177226_a(BOTTOM, false));
-      ModBlocks.BLOCKS.add(this);
-      ModItems.ITEMS.add((new ItemBlock(this)).setRegistryName("scaffolding"));
-   }
+    public BlockScaffolding() {
+        super(Material.WOOD);
+        this.setTranslationKey("scaffolding");
+        this.setRegistryName("backported", "scaffolding");
+        this.setHardness(0.0F);
+        this.setResistance(0.0F);
+        this.setSoundType(SoundType.WOOD);
+        this.setLightOpacity(0);
+        this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+        this.setDefaultState(this.blockState.getBaseState().withProperty(DISTANCE, 0).withProperty(BOTTOM, false));
+        ModBlocks.BLOCKS.add(this);
+        ModItems.ITEMS.add((new ItemBlock(this)).setRegistryName("scaffolding"));
+    }
 
-   @SideOnly(Side.CLIENT)
-   public BlockRenderLayer func_180664_k() {
-      return BlockRenderLayer.CUTOUT_MIPPED;
-   }
+    @SideOnly(Side.CLIENT)
+    public BlockRenderLayer getRenderLayer() {
+        return BlockRenderLayer.CUTOUT_MIPPED;
+    }
 
-   public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
-      return 60;
-   }
+    public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
+        return 60;
+    }
 
-   protected BlockStateContainer func_180661_e() {
-      return new BlockStateContainer(this, new IProperty[]{DISTANCE, BOTTOM});
-   }
+    public boolean isOpaqueCube(IBlockState state) {
+        return false;
+    }
 
-   public IBlockState func_176203_a(int meta) {
-      return this.func_176223_P().func_177226_a(DISTANCE, meta & 7).func_177226_a(BOTTOM, (meta & 8) == 0);
-   }
+    public boolean isFullCube(IBlockState state) {
+        return false;
+    }
 
-   public int func_176201_c(IBlockState state) {
-      int meta = (Integer)state.func_177229_b(DISTANCE);
-      if ((Boolean)state.func_177229_b(BOTTOM)) {
-         meta |= 8;
-      }
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, DISTANCE, BOTTOM);
+    }
 
-      return meta;
-   }
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(DISTANCE, meta & 7).withProperty(BOTTOM, (meta & 8) == 0);
+    }
 
-   public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-      int distance = this.getDistance(world, pos);
-      if (distance == 7) {
-         this.spawnFallingScaffolding(world, pos, this.func_176223_P());
-         return Blocks.field_150350_a.func_176223_P();
-      } else {
-         return this.func_176223_P().func_177226_a(DISTANCE, distance).func_177226_a(BOTTOM, this.isBottomScaffolding(world, pos));
-      }
-   }
+    public int getMetaFromState(IBlockState state) {
+        int meta = state.getValue(DISTANCE);
+        if (state.getValue(BOTTOM)) {
+            meta |= 8;
+        }
+        return meta;
+    }
 
-   public boolean canCreatureSpawn(IBlockState state, IBlockAccess world, BlockPos pos, EntityLiving.SpawnPlacementType type) {
-      return false;
-   }
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+        int distance = this.getDistance(world, pos);
+        if (distance == 7) {
+            this.spawnFallingScaffolding(world, pos, this.getDefaultState());
+            return Blocks.AIR.getDefaultState();
+        } else {
+            return this.getDefaultState().withProperty(DISTANCE, distance).withProperty(BOTTOM, this.isBottomScaffolding(world, pos));
+        }
+    }
 
-   public AxisAlignedBB func_185496_a(IBlockState state, IBlockAccess source, BlockPos pos) {
-      return field_185505_j;
-   }
+    public boolean canCreatureSpawn(IBlockState state, IBlockAccess world, BlockPos pos, EntityLiving.SpawnPlacementType type) {
+        return false;
+    }
 
-   public RayTraceResult func_180636_a(IBlockState state, World worldIn, BlockPos pos, Vec3d start, Vec3d end) {
-      RayTraceResult resultTop = this.func_185503_a(pos, start, end, COLLISION_BOX);
-      RayTraceResult resultFL = this.func_185503_a(pos, start, end, LEG_FL);
-      RayTraceResult resultFR = this.func_185503_a(pos, start, end, LEG_FR);
-      RayTraceResult resultBL = this.func_185503_a(pos, start, end, LEG_BL);
-      RayTraceResult resultBR = this.func_185503_a(pos, start, end, LEG_BR);
-      RayTraceResult resultBottom = this.func_185503_a(pos, start, end, COLLISION_BOX_BOTTOM);
-      RayTraceResult closestResult = null;
-      double closestDistance = Double.MAX_VALUE;
-      RayTraceResult[] results;
-      if ((Boolean)state.func_177229_b(BOTTOM)) {
-         results = new RayTraceResult[]{resultFL, resultFR, resultBL, resultBR, resultTop, resultBottom};
-      } else {
-         results = new RayTraceResult[]{resultFL, resultFR, resultBL, resultBR, resultTop};
-      }
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        return Block.NULL_AABB;
+    }
 
-      for(RayTraceResult result : results) {
-         if (result != null) {
-            double distance = result.field_72307_f.func_72436_e(start);
-            if (distance < closestDistance) {
-               closestResult = result;
-               closestDistance = distance;
+    @Nullable
+    public RayTraceResult collisionRayTrace(IBlockState state, World worldIn, BlockPos pos, Vec3d start, Vec3d end) {
+        RayTraceResult resultTop = this.rayTrace(pos, start, end, COLLISION_BOX);
+        RayTraceResult resultFL = this.rayTrace(pos, start, end, LEG_FL);
+        RayTraceResult resultFR = this.rayTrace(pos, start, end, LEG_FR);
+        RayTraceResult resultBL = this.rayTrace(pos, start, end, LEG_BL);
+        RayTraceResult resultBR = this.rayTrace(pos, start, end, LEG_BR);
+        RayTraceResult resultBottom = this.rayTrace(pos, start, end, COLLISION_BOX_BOTTOM);
+        RayTraceResult closestResult = null;
+        double closestDistance = Double.MAX_VALUE;
+        RayTraceResult[] results;
+
+        if (state.getValue(BOTTOM)) {
+            results = new RayTraceResult[]{resultFL, resultFR, resultBL, resultBR, resultTop, resultBottom};
+        } else {
+            results = new RayTraceResult[]{resultFL, resultFR, resultBL, resultBR, resultTop};
+        }
+
+        for (RayTraceResult result : results) {
+            if (result != null) {
+                double distance = result.hitVec.squareDistanceTo(start);
+                if (distance < closestDistance) {
+                    closestResult = result;
+                    closestDistance = distance;
+                }
             }
-         }
-      }
+        }
 
-      return closestResult;
-   }
+        return closestResult;
+    }
 
-   public AxisAlignedBB func_180646_a(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-      return field_185506_k;
-   }
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+        return NULL_AABB;
+    }
 
-   public void func_185477_a(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
-      if (entityIn != null) {
-         if ((Boolean)state.func_177229_b(BOTTOM)) {
-            if (entityIn.field_70163_u >= (double)pos.func_177956_o() + (double)1.0F && !entityIn.func_70093_af() && entityIn.field_70181_x <= (double)0.0F) {
-               func_185492_a(pos, entityBox, collidingBoxes, COLLISION_BOX);
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+        if (entityIn != null) {
+            if (state.getValue(BOTTOM)) {
+                if (entityIn.posY >= (double)pos.getY() + 1.0F && !entityIn.isSneaking() && entityIn.motionY <= 0.0F) {
+                    addCollisionBoxToList(pos, entityBox, collidingBoxes, COLLISION_BOX);
+                }
+                if (entityIn.posY >= (double)pos.getY() && entityIn.motionY <= 0.0F) {
+                    addCollisionBoxToList(pos, entityBox, collidingBoxes, COLLISION_BOX_BOTTOM);
+                }
+            } else if (!(entityIn instanceof EntityPlayer) || !((EntityPlayer)entityIn).isSneaking()) {
+                if (entityIn.posY >= (double)pos.getY() + 1.0F) {
+                    addCollisionBoxToList(pos, entityBox, collidingBoxes, COLLISION_BOX);
+                }
             }
+        }
+    }
 
-            if (entityIn.field_70163_u >= (double)pos.func_177956_o() && entityIn.field_70181_x <= (double)0.0F) {
-               func_185492_a(pos, entityBox, collidingBoxes, COLLISION_BOX_BOTTOM);
+    public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+        if (entityIn instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer)entityIn;
+            if (player.posX > (double)pos.getX() && player.posX < (double)(pos.getX() + 1) && player.posZ > (double)pos.getZ() && player.posZ < (double)(pos.getZ() + 1)) {
+                if (!worldIn.isRemote) {
+                    if (worldIn.getTotalWorldTime() % 10L == 0L && player.motionY != 0.0F) {
+                        worldIn.playSound(null, player.getPosition(), SoundEvents.BLOCK_SCAFFOLDING_FALL, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                    }
+                    return;
+                }
+
+                if (player.isSneaking()) {
+                    player.motionY = -0.1;
+                    player.fallDistance = 0.0F;
+                    player.onGround = true;
+                } else if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode())) {
+                    player.motionY = 0.2F;
+                    player.fallDistance = 0.0F;
+                } else {
+                    player.motionY *= 0.5F;
+                    player.motionX *= 0.5F;
+                    player.motionZ *= 0.5F;
+                    player.fallDistance = 0.0F;
+                }
             }
+        }
+    }
 
-         } else if (!(entityIn instanceof EntityPlayer) || !((EntityPlayer)entityIn).func_70093_af()) {
-            if (entityIn.field_70163_u >= (double)pos.func_177956_o() + (double)1.0F) {
-               func_185492_a(pos, entityBox, collidingBoxes, COLLISION_BOX);
-            }
+    public boolean isNormalCube(IBlockState state) {
+        return true;
+    }
 
-         }
-      }
-   }
-
-   public void func_180634_a(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
-      if (entityIn instanceof EntityPlayer) {
-         EntityPlayer player = (EntityPlayer)entityIn;
-         if (player.field_70165_t > (double)pos.func_177958_n() && player.field_70165_t < (double)(pos.func_177958_n() + 1) && player.field_70161_v > (double)pos.func_177952_p() && player.field_70161_v < (double)(pos.func_177952_p() + 1)) {
-            if (!worldIn.field_72995_K) {
-               if (worldIn.func_82737_E() % 10L == 0L && player.field_70181_x != (double)0.0F) {
-                  worldIn.func_184133_a((EntityPlayer)null, player.func_180425_c(), SoundEvents.field_187653_cW, SoundCategory.BLOCKS, 0.15F, 1.0F);
-               }
-
-               return;
-            }
-
-            if (player.func_70093_af()) {
-               player.field_70181_x = -0.1;
-               player.field_70143_R = 0.0F;
-               player.field_70122_E = true;
-            } else if (Keyboard.isKeyDown(Minecraft.func_71410_x().field_71474_y.field_74314_A.func_151463_i())) {
-               player.field_70181_x = (double)0.2F;
-               player.field_70143_R = 0.0F;
-            } else {
-               player.field_70181_x *= (double)0.5F;
-               player.field_70159_w *= (double)0.5F;
-               player.field_70179_y *= (double)0.5F;
-               player.field_70143_R = 0.0F;
-            }
-         }
-      }
-
-   }
-
-   public boolean func_185481_k(IBlockState state) {
-      return true;
-   }
-
-   public boolean func_149662_c(IBlockState state) {
-      return false;
-   }
-
-   public boolean func_149686_d(IBlockState state) {
-      return false;
-   }
-
-   public boolean func_149637_q(IBlockState state) {
-      return false;
-   }
-
-   public void func_189540_a(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
-      if (!worldIn.field_72995_K) {
-         int distance = this.getDistance(worldIn, pos);
-         if (distance > 7) {
-            worldIn.func_175655_b(pos, true);
-            return;
-         }
-
-         worldIn.func_175656_a(pos, state.func_177226_a(DISTANCE, distance).func_177226_a(BOTTOM, this.isBottomScaffolding(worldIn, pos)));
-         if (worldIn.func_180495_p(pos).func_177230_c() == this && !this.canStayAt(worldIn, pos)) {
-            worldIn.func_175655_b(pos, true);
-         }
-      }
-
-   }
-
-   private int getDistance(World world, BlockPos pos) {
-      if (world.func_180495_p(pos.func_177977_b()).func_185896_q()) {
-         return 0;
-      } else {
-         int minDistance = 7;
-
-         for(EnumFacing facing : Plane.HORIZONTAL) {
-            BlockPos neighborPos = pos.func_177972_a(facing);
-            IBlockState neighborState = world.func_180495_p(neighborPos);
-            if (neighborState.func_177230_c() == this) {
-               minDistance = Math.min(minDistance, (Integer)neighborState.func_177229_b(DISTANCE) + 1);
-            }
-         }
-
-         return minDistance;
-      }
-   }
-
-   private boolean isBottomScaffolding(World world, BlockPos pos) {
-      return !world.func_180495_p(pos.func_177977_b()).func_185896_q();
-   }
-
-   public void func_180633_a(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-      if (!worldIn.field_72995_K) {
-         int distance = this.getDistance(worldIn, pos);
-         worldIn.func_175656_a(pos, state.func_177226_a(DISTANCE, distance).func_177226_a(BOTTOM, this.isBottomScaffolding(worldIn, pos)));
-      }
-
-   }
-
-   private boolean canStayAt(World worldIn, BlockPos pos) {
-      if (this.getDistance(worldIn, pos) == 7) {
-         return false;
-      } else {
-         IBlockState belowState = worldIn.func_180495_p(pos.func_177977_b());
-         if (belowState.func_185896_q()) {
-            return true;
-         } else {
-            int distance = (Integer)worldIn.func_180495_p(pos).func_177229_b(DISTANCE);
-
-            for(EnumFacing facing : Plane.HORIZONTAL) {
-               if (worldIn.func_180495_p(pos.func_177972_a(facing)).func_177230_c() == this && distance > (Integer)worldIn.func_180495_p(pos.func_177972_a(facing)).func_177229_b(DISTANCE)) {
-                  return true;
-               }
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        if (!worldIn.isRemote) {
+            int distance = this.getDistance(worldIn, pos);
+            if (distance > 7) {
+                worldIn.destroyBlock(pos, true);
+                return;
             }
 
+            worldIn.setBlockState(pos, state.withProperty(DISTANCE, distance).withProperty(BOTTOM, this.isBottomScaffolding(worldIn, pos)));
+            if (worldIn.getBlockState(pos).getBlock() == this && !this.canStayAt(worldIn, pos)) {
+                worldIn.destroyBlock(pos, true);
+            }
+        }
+    }
+
+    private int getDistance(World world, BlockPos pos) {
+        if (world.getBlockState(pos.down()).isFullBlock()) {
+            return 0;
+        } else {
+            int minDistance = 7;
+            for (EnumFacing facing : Plane.HORIZONTAL) {
+                BlockPos neighborPos = pos.offset(facing);
+                IBlockState neighborState = world.getBlockState(neighborPos);
+                if (neighborState.getBlock() == this) {
+                    minDistance = Math.min(minDistance, neighborState.getValue(DISTANCE) + 1);
+                }
+            }
+            return minDistance;
+        }
+    }
+
+    private boolean isBottomScaffolding(World world, BlockPos pos) {
+        return !world.getBlockState(pos.down()).isFullBlock();
+    }
+
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        if (!worldIn.isRemote) {
+            int distance = this.getDistance(worldIn, pos);
+            worldIn.setBlockState(pos, state.withProperty(DISTANCE, distance).withProperty(BOTTOM, this.isBottomScaffolding(worldIn, pos)));
+        }
+    }
+
+    private boolean canStayAt(World worldIn, BlockPos pos) {
+        if (this.getDistance(worldIn, pos) == 7) {
             return false;
-         }
-      }
-   }
-
-   public boolean func_176196_c(World worldIn, BlockPos pos) {
-      return worldIn.func_180495_p(pos.func_177977_b()).func_185896_q() || this.getDistance(worldIn, pos) < 7 || worldIn.func_180495_p(pos.func_177984_a()).func_177230_c() == this;
-   }
-
-   public boolean func_180639_a(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-      if (worldIn.field_72995_K) {
-         return true;
-      } else {
-         ItemStack heldItem = playerIn.func_184586_b(hand);
-         if (!(heldItem.func_77973_b() instanceof ItemBlock)) {
-            return false;
-         } else {
-            Block heldBlock = ((ItemBlock)heldItem.func_77973_b()).func_179223_d();
-            if (heldBlock != this) {
-               if (heldBlock.func_176196_c(worldIn, pos.func_177972_a(facing))) {
-                  worldIn.func_184133_a((EntityPlayer)null, pos.func_177972_a(facing), heldBlock.func_185467_w().func_185841_e(), SoundCategory.BLOCKS, 1.0F, 1.0F);
-               }
-
-               return false;
-            } else if (worldIn.func_180495_p(pos.func_177977_b()).func_177230_c() == Blocks.field_150350_a && (double)hitY <= (double)0.125F && (double)hitX >= (double)0.125F && (double)hitZ >= (double)0.125F && (double)hitX <= (double)0.875F && (double)hitZ <= (double)0.875F) {
-               pos = pos.func_177977_b();
-               AxisAlignedBB aabb = (new AxisAlignedBB(pos)).grow(0.1);
-
-               for(EntityFallingBlock entity : worldIn.func_72872_a(EntityFallingBlock.class, aabb)) {
-                  if (entity.func_180425_c().equals(pos)) {
-                     return true;
-                  }
-               }
-
-               worldIn.func_175656_a(pos, this.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, 0, playerIn, hand));
-               worldIn.func_184133_a((EntityPlayer)null, pos, this.field_149762_H.func_185841_e(), SoundCategory.BLOCKS, 1.0F, 1.0F);
-               if (!playerIn.func_184812_l_()) {
-                  playerIn.func_184586_b(hand).func_190918_g(1);
-               }
-
-               return true;
-            } else if (facing != EnumFacing.UP) {
-               while(worldIn.func_180495_p(pos.func_177984_a()).func_177230_c() == ModBlocks.SCAFFOLDING) {
-                  pos = pos.func_177984_a();
-                  if (pos.func_177956_o() > 255) {
-                     return false;
-                  }
-               }
-
-               pos = pos.func_177984_a();
-               if (worldIn.func_180495_p(pos).func_177230_c() == Blocks.field_150350_a) {
-                  worldIn.func_175656_a(pos, this.func_176223_P());
-                  worldIn.func_184133_a((EntityPlayer)null, pos, this.field_149762_H.func_185841_e(), SoundCategory.BLOCKS, 1.0F, 1.0F);
-                  if (!playerIn.func_184812_l_()) {
-                     playerIn.func_184586_b(hand).func_190918_g(1);
-                  }
-
-                  return true;
-               } else {
-                  return false;
-               }
+        } else {
+            IBlockState belowState = worldIn.getBlockState(pos.down());
+            if (belowState.isFullBlock()) {
+                return true;
             } else {
-               EnumFacing playerFacing = playerIn.func_174811_aO();
-               int length = 1;
-
-               while(worldIn.func_180495_p(pos).func_177230_c() == ModBlocks.SCAFFOLDING) {
-                  pos = pos.func_177972_a(playerFacing);
-                  ++length;
-                  if (length == 8) {
-                     return true;
-                  }
-               }
-
-               if (worldIn.func_180495_p(pos).func_177230_c() == Blocks.field_150350_a) {
-                  AxisAlignedBB aabb = (new AxisAlignedBB(pos)).grow(0.1);
-
-                  for(EntityFallingBlock entity : worldIn.func_72872_a(EntityFallingBlock.class, aabb)) {
-                     if (entity.func_180425_c().equals(pos)) {
+                int distance = worldIn.getBlockState(pos).getValue(DISTANCE);
+                for (EnumFacing facing : Plane.HORIZONTAL) {
+                    if (worldIn.getBlockState(pos.offset(facing)).getBlock() == this && distance > worldIn.getBlockState(pos.offset(facing)).getValue(DISTANCE)) {
                         return true;
-                     }
-                  }
-
-                  worldIn.func_175656_a(pos, this.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, 0, playerIn, hand));
-                  worldIn.func_184133_a((EntityPlayer)null, pos, this.field_149762_H.func_185841_e(), SoundCategory.BLOCKS, 1.0F, 1.0F);
-                  if (!playerIn.func_184812_l_()) {
-                     playerIn.func_184586_b(hand).func_190918_g(1);
-                  }
-               }
-
-               return true;
+                    }
+                }
+                return false;
             }
-         }
-      }
-   }
+        }
+    }
 
-   public void func_180663_b(World worldIn, BlockPos pos, IBlockState state) {
-      super.func_180663_b(worldIn, pos, state);
+    public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
+        return worldIn.getBlockState(pos.down()).isFullBlock() || this.getDistance(worldIn, pos) < 7 || worldIn.getBlockState(pos.up()).getBlock() == this;
+    }
 
-      for(EnumFacing facing : EnumFacing.values()) {
-         BlockPos neighborPos = pos.func_177972_a(facing);
-         IBlockState neighborState = worldIn.func_180495_p(neighborPos);
-         if (neighborState.func_177230_c() == this) {
-            worldIn.func_175684_a(neighborPos, this, 1);
-         }
-      }
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        if (worldIn.isRemote) {
+            return true;
+        } else {
+            ItemStack heldItem = playerIn.getHeldItem(hand);
+            if (!(heldItem.getItem() instanceof ItemBlock)) {
+                return false;
+            } else {
+                Block heldBlock = ((ItemBlock)heldItem.getItem()).getBlock();
+                if (heldBlock != this) {
+                    if (heldBlock.canPlaceBlockAt(worldIn, pos.offset(facing))) {
+                        worldIn.playSound(null, pos.offset(facing), heldBlock.getSoundType().getPlaceSound(), SoundCategory.BLOCKS, 1.0F, 1.0F);
+                    }
+                    return false;
+                } else if (worldIn.getBlockState(pos.down()).getBlock() == Blocks.AIR && hitY <= 0.125F && hitX >= 0.125F && hitZ >= 0.125F && hitX <= 0.875F && hitZ <= 0.875F) {
+                    pos = pos.down();
+                    AxisAlignedBB aabb = (new AxisAlignedBB(pos)).grow(0.1);
 
-   }
+                    for (EntityFallingBlock entity : worldIn.getEntitiesWithinAABB(EntityFallingBlock.class, aabb)) {
+                        if (entity.getPosition().equals(pos)) {
+                            return true;
+                        }
+                    }
 
-   private void spawnFallingScaffolding(World world, BlockPos pos, IBlockState state) {
-      if (!world.field_72995_K) {
-         EntityFallingBlock fallingBlock = new EntityFallingBlock(world, (double)pos.func_177958_n() + (double)0.5F, (double)pos.func_177956_o(), (double)pos.func_177952_p() + (double)0.5F, state);
-         fallingBlock.field_145812_b = 1;
-         fallingBlock.func_189654_d(false);
-         fallingBlock.func_145806_a(false);
-         world.func_72838_d(fallingBlock);
-      }
+                    worldIn.setBlockState(pos, this.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, 0, playerIn, hand));
+                    worldIn.playSound(null, pos, this.getSoundType().getPlaceSound(), SoundCategory.BLOCKS, 1.0F, 1.0F);
+                    if (!playerIn.isCreative()) {
+                        playerIn.getHeldItem(hand).shrink(1);
+                    }
+                    return true;
+                } else if (facing != EnumFacing.UP) {
+                    while (worldIn.getBlockState(pos.up()).getBlock() == ModBlocks.SCAFFOLDING) {
+                        pos = pos.up();
+                        if (pos.getY() > 255) {
+                            return false;
+                        }
+                    }
 
-   }
+                    pos = pos.up();
+                    if (worldIn.getBlockState(pos).getBlock() == Blocks.AIR) {
+                        worldIn.setBlockState(pos, this.getDefaultState());
+                        worldIn.playSound(null, pos, this.getSoundType().getPlaceSound(), SoundCategory.BLOCKS, 1.0F, 1.0F);
+                        if (!playerIn.isCreative()) {
+                            playerIn.getHeldItem(hand).shrink(1);
+                        }
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    EnumFacing playerFacing = playerIn.getHorizontalFacing();
+                    int length = 1;
+
+                    while (worldIn.getBlockState(pos).getBlock() == ModBlocks.SCAFFOLDING) {
+                        pos = pos.offset(playerFacing);
+                        length++;
+                        if (length == 8) {
+                            return true;
+                        }
+                    }
+
+                    if (worldIn.getBlockState(pos).getBlock() == Blocks.AIR) {
+                        AxisAlignedBB aabb = (new AxisAlignedBB(pos)).grow(0.1);
+
+                        for (EntityFallingBlock entity : worldIn.getEntitiesWithinAABB(EntityFallingBlock.class, aabb)) {
+                            if (entity.getPosition().equals(pos)) {
+                                return true;
+                            }
+                        }
+
+                        worldIn.setBlockState(pos, this.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, 0, playerIn, hand));
+                        worldIn.playSound(null, pos, this.getSoundType().getPlaceSound(), SoundCategory.BLOCKS, 1.0F, 1.0F);
+                        if (!playerIn.isCreative()) {
+                            playerIn.getHeldItem(hand).shrink(1);
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+    }
+
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        super.breakBlock(worldIn, pos, state);
+
+        for (EnumFacing facing : EnumFacing.values()) {
+            BlockPos neighborPos = pos.offset(facing);
+            IBlockState neighborState = worldIn.getBlockState(neighborPos);
+            if (neighborState.getBlock() == this) {
+                worldIn.notifyNeighborsOfStateChange(neighborPos, this, true);
+            }
+        }
+    }
+
+    private void spawnFallingScaffolding(World world, BlockPos pos, IBlockState state) {
+        if (!world.isRemote) {
+            EntityFallingBlock fallingBlock = new EntityFallingBlock(world, (double)pos.getX() + 0.5F, (double)pos.getY(), (double)pos.getZ() + 0.5F, state);
+            fallingBlock.fallTime = 1;
+            fallingBlock.shouldDropItem(false);
+            fallingBlock.setHurtEntities(false);
+            world.spawnEntity(fallingBlock);
+        }
+    }
 }
-
