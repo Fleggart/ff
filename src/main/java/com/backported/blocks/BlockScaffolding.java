@@ -110,7 +110,7 @@ public class BlockScaffolding extends Block {
     }
 
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-    return FULL_BLOCK_AABB;
+    return Block.NULL_AABB;
 }
 
     @Nullable
@@ -144,9 +144,9 @@ public class BlockScaffolding extends Block {
         return closestResult;
     }
 
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-    return FULL_BLOCK_AABB;
-}
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+        return NULL_AABB;
+    }
 
     public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
         if (entityIn != null) {
