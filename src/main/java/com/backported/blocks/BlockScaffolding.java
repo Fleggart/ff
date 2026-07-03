@@ -62,31 +62,38 @@ public class BlockScaffolding extends Block {
         ModItems.ITEMS.add((new ItemBlock(this)).setRegistryName("scaffolding"));
     }
 
+    @Override
     @SideOnly(Side.CLIENT)
     public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.CUTOUT_MIPPED;
     }
 
+    @Override
     public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
         return 60;
     }
 
+    @Override
     public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
+    @Override
     public boolean isFullCube(IBlockState state) {
         return false;
     }
 
+    @Override
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, DISTANCE, BOTTOM);
     }
 
+    @Override
     public IBlockState getStateFromMeta(int meta) {
         return this.getDefaultState().withProperty(DISTANCE, meta & 7).withProperty(BOTTOM, (meta & 8) == 0);
     }
 
+    @Override
     public int getMetaFromState(IBlockState state) {
         int meta = state.getValue(DISTANCE);
         if (state.getValue(BOTTOM)) {
@@ -95,6 +102,7 @@ public class BlockScaffolding extends Block {
         return meta;
     }
 
+    @Override
     public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
         int distance = this.getDistance(world, pos);
         if (distance == 7) {
@@ -105,15 +113,17 @@ public class BlockScaffolding extends Block {
         }
     }
 
+    @Override
     public boolean canCreatureSpawn(IBlockState state, IBlockAccess world, BlockPos pos, EntityLiving.SpawnPlacementType type) {
         return false;
     }
 
+    @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-    return FULL_BLOCK_AABB;
-}
+        return FULL_BLOCK_AABB;
+    }
 
-
+    @Override
     @Nullable
     public RayTraceResult collisionRayTrace(IBlockState state, World worldIn, BlockPos pos, Vec3d start, Vec3d end) {
         RayTraceResult resultTop = this.rayTrace(pos, start, end, COLLISION_BOX);
@@ -145,10 +155,12 @@ public class BlockScaffolding extends Block {
         return closestResult;
     }
 
+    @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
         return NULL_AABB;
     }
 
+    @Override
     public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
         if (entityIn != null) {
             if (state.getValue(BOTTOM)) {
@@ -166,10 +178,15 @@ public class BlockScaffolding extends Block {
         }
     }
 
+    @Override
     public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
         if (entityIn instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer)entityIn;
-            if (player.posX > (double)pos.getX() && player.posX < (double)(pos.getX() + 1) && player.posZ > (double)pos.getZ() && player.posZ < (double)(pos.getZ() + 1)) {
+            
+            // 【核心优化判定】创建向内缩进 0.05 格的隐形缓冲盒，用于对抗周边硬方块对玩家碰撞箱造成的挤压
+            AxisAlignedBB scaffoldingLeeway = new AxisAlignedBB(pos).grow(-0.05);
+            
+            if (player.getEntityBoundingBox().intersects(scaffoldingLeeway)) {
                 if (!worldIn.isRemote) {
                     if (worldIn.getTotalWorldTime() % 10L == 0L && player.motionY != 0.0F) {
                         worldIn.playSound(null, player.getPosition(), SoundEvents.BLOCK_WOOD_STEP, SoundCategory.BLOCKS, 0.15F, 1.0F);
@@ -178,26 +195,36 @@ public class BlockScaffolding extends Block {
                 }
 
                 if (player.isSneaking()) {
-                    player.motionY = -0.1;
+                    // 按住 Shift 下降速度调整为 -0.15 (与原版一致)，强制清除下落伤害判定
+                    player.motionY = -0.15;
                     player.fallDistance = 0.0F;
                     player.onGround = true;
                 } else if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode())) {
+                    // 按住空格攀爬速度
                     player.motionY = 0.2F;
                     player.fallDistance = 0.0F;
                 } else {
-                    player.motionY *= 0.5F;
-                    player.motionX *= 0.5F;
-                    player.motionZ *= 0.5F;
+                    // 悬停/缓慢下滑逻辑：如果检测到玩家正在按 WASD 水平位移，给予微弱向下移动的倾斜，手感更佳
+                    if (player.moveForward != 0.0F || player.moveStrafing != 0.0F) {
+                        player.motionY = -0.05;
+                    } else {
+                        player.motionY *= 0.5F;
+                    }
+                    // 水平摩擦阻尼由原先极度粘滞的 0.5F 释放为 0.85F，避免产生被胶水粘住的滞后感
+                    player.motionX *= 0.85F;
+                    player.motionZ *= 0.85F;
                     player.fallDistance = 0.0F;
                 }
             }
         }
     }
 
+    @Override
     public boolean isNormalCube(IBlockState state) {
         return false;
     }
 
+    @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
         if (!worldIn.isRemote) {
             int distance = this.getDistance(worldIn, pos);
@@ -233,6 +260,7 @@ public class BlockScaffolding extends Block {
         return !world.getBlockState(pos.down()).isFullBlock();
     }
 
+    @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
         if (!worldIn.isRemote) {
             int distance = this.getDistance(worldIn, pos);
@@ -259,10 +287,12 @@ public class BlockScaffolding extends Block {
         }
     }
 
+    @Override
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
         return worldIn.getBlockState(pos.down()).isFullBlock() || this.getDistance(worldIn, pos) < 7 || worldIn.getBlockState(pos.up()).getBlock() == this;
     }
 
+    @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (worldIn.isRemote) {
             return true;
@@ -345,6 +375,7 @@ public class BlockScaffolding extends Block {
         }
     }
 
+    @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
         super.breakBlock(worldIn, pos, state);
 
