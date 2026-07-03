@@ -109,8 +109,9 @@ public class BlockScaffolding extends Block {
         return false;
     }
 
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-    return Block.NULL_AABB;
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+    return FULL_BLOCK_AABB;
+}
 }
 
     @Nullable
