@@ -195,7 +195,7 @@ public class BlockScaffolding extends Block {
     }
 
     public boolean isNormalCube(IBlockState state) {
-        return true;
+        return false;
     }
 
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
