@@ -1,4 +1,4 @@
-Package com.backported.blocks;
+package com.backported.blocks;
 
 import com.backported.init.ModBlocks;
 import com.backported.init.ModItems;
