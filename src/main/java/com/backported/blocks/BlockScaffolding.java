@@ -360,7 +360,6 @@ public class BlockScaffolding extends Block {
         if (!world.isRemote) {
             EntityFallingBlock fallingBlock = new EntityFallingBlock(world, (double)pos.getX() + 0.5F, (double)pos.getY(), (double)pos.getZ() + 0.5F, state);
             fallingBlock.fallTime = 1;
-            fallingBlock.dropItem(false);
             fallingBlock.setHurtEntities(false);
             world.spawnEntity(fallingBlock);
         }
