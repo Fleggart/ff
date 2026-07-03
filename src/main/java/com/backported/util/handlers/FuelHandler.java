@@ -7,6 +7,6 @@ import net.minecraftforge.fml.common.IFuelHandler;
 
 public class FuelHandler implements IFuelHandler {
    public int getBurnTime(ItemStack fuel) {
-      return fuel.getItem() == Item.func_150898_a(ModBlocks.SCAFFOLDING) ? 50 : 0;
+      return fuel.getItem() == Item.getItemFromBlock(ModBlocks.SCAFFOLDING) ? 50 : 0;
    }
 }
