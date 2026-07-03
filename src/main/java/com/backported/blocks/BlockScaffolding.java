@@ -112,7 +112,7 @@ public class BlockScaffolding extends Block {
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
     return FULL_BLOCK_AABB;
 }
-}
+
 
     @Nullable
     public RayTraceResult collisionRayTrace(IBlockState state, World worldIn, BlockPos pos, Vec3d start, Vec3d end) {
