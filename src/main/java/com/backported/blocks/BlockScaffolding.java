@@ -220,7 +220,7 @@ public class BlockScaffolding extends Block {
     }
 
     @Override
-    public boolean isNormalCube(IBlockState state) {
+    public boolean isBlockNormalCube(IBlockState state) {
         return false;
     }
 
