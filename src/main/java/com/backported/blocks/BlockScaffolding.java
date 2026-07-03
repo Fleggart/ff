@@ -171,7 +171,7 @@ public class BlockScaffolding extends Block {
             if (player.posX > (double)pos.getX() && player.posX < (double)(pos.getX() + 1) && player.posZ > (double)pos.getZ() && player.posZ < (double)(pos.getZ() + 1)) {
                 if (!worldIn.isRemote) {
                     if (worldIn.getTotalWorldTime() % 10L == 0L && player.motionY != 0.0F) {
-                        worldIn.playSound(null, player.getPosition(), SoundEvents.BLOCK_SCAFFOLDING_FALL, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                        worldIn.playSound(null, player.getPosition(), SoundEvents.BLOCK_WOOD_STEP, SoundCategory.BLOCKS, 0.15F, 1.0F);
                     }
                     return;
                 }
@@ -360,7 +360,7 @@ public class BlockScaffolding extends Block {
         if (!world.isRemote) {
             EntityFallingBlock fallingBlock = new EntityFallingBlock(world, (double)pos.getX() + 0.5F, (double)pos.getY(), (double)pos.getZ() + 0.5F, state);
             fallingBlock.fallTime = 1;
-            fallingBlock.shouldDropItem(false);
+            fallingBlock.dropItem(false);
             fallingBlock.setHurtEntities(false);
             world.spawnEntity(fallingBlock);
         }
