@@ -409,4 +409,4 @@ public class BlockScaffolding extends Block {
             world.spawnEntity(fallingBlock);
         }
     }
-                    }
+}
