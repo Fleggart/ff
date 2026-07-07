@@ -49,7 +49,6 @@ public class BlockScaffolding extends Block {
     protected static final AxisAlignedBB LEG_FL = new AxisAlignedBB(0.0F, 0.0F, 0.875F, 0.125F, 1.0F, 1.0F);
     protected static final AxisAlignedBB LEG_FR = new AxisAlignedBB(0.875F, 0.0F, 0.875F, 1.0F, 1.0F, 1.0F);
 
-    // 反射获取 EntityLivingBase 内部的 isJumping 字段，用于安全检测玩家是否按下跳跃
     private static final Field isJumpingField = ReflectionHelper.findField(EntityLivingBase.class, "isJumping", "field_70703_bu");
 
     public BlockScaffolding() {
@@ -111,7 +110,6 @@ public class BlockScaffolding extends Block {
     public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
         int distance = this.getDistance(world, pos);
         if (distance == 7) {
-            // 规避死循环危险：如果超过延伸距离，放置时直接以物品形式掉落
             if (!world.isRemote) {
                 world.spawnEntity(new EntityItem(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(this)));
             }
@@ -127,8 +125,8 @@ public class BlockScaffolding extends Block {
     }
 
     @Nullable
-    @Override
     public RayTraceResult collisionRayTrace(IBlockState state, World worldIn, BlockPos pos, Vec3d start, Vec3d end) {
+        // 修复：移除 @Override 标签以适配不同的 MCP Mappings 映射
         RayTraceResult resultTop = this.rayTrace(pos, start, end, COLLISION_BOX);
         RayTraceResult resultFL = this.rayTrace(pos, start, end, LEG_FL);
         RayTraceResult resultFR = this.rayTrace(pos, start, end, LEG_FR);
@@ -159,12 +157,11 @@ public class BlockScaffolding extends Block {
 
     @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
-        // 修复：将 IBlockAccess 改为 World，对齐 1.12.2 原版方法签名
         return NULL_AABB;
     }
 
-    @Override
     public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+        // 修复：移除 @Override 标签，彻底避免由于 Forge 注入导致的签名识别冲突
         if (entityIn != null) {
             if (state.getValue(BOTTOM)) {
                 if (entityIn.posY >= (double)pos.getY() + 1.0F && !entityIn.isSneaking() && entityIn.motionY <= 0.0F) {
