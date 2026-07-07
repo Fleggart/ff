@@ -158,7 +158,8 @@ public class BlockScaffolding extends Block {
     }
 
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
+        // 修复：将 IBlockAccess 改为 World，对齐 1.12.2 原版方法签名
         return NULL_AABB;
     }
 
