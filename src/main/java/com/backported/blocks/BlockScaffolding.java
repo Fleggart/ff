@@ -119,14 +119,13 @@ public class BlockScaffolding extends Block {
         }
     }
 
-    @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+        // 修复：移除 @Override 标签以兼容不同 Mappings 映射
         return FULL_BLOCK_AABB;
     }
 
     @Nullable
     public RayTraceResult collisionRayTrace(IBlockState state, World worldIn, BlockPos pos, Vec3d start, Vec3d end) {
-        // 修复：移除 @Override 标签以适配不同的 MCP Mappings 映射
         RayTraceResult resultTop = this.rayTrace(pos, start, end, COLLISION_BOX);
         RayTraceResult resultFL = this.rayTrace(pos, start, end, LEG_FL);
         RayTraceResult resultFR = this.rayTrace(pos, start, end, LEG_FR);
@@ -155,13 +154,12 @@ public class BlockScaffolding extends Block {
         return closestResult;
     }
 
-    @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
+        // 修复：移除 @Override 标签以兼容不同 Mappings 映射
         return NULL_AABB;
     }
 
     public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
-        // 修复：移除 @Override 标签，彻底避免由于 Forge 注入导致的签名识别冲突
         if (entityIn != null) {
             if (state.getValue(BOTTOM)) {
                 if (entityIn.posY >= (double)pos.getY() + 1.0F && !entityIn.isSneaking() && entityIn.motionY <= 0.0F) {
