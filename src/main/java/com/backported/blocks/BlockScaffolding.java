@@ -15,7 +15,6 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityItem;
@@ -112,7 +111,7 @@ public class BlockScaffolding extends Block {
     public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
         int distance = this.getDistance(world, pos);
         if (distance == 7) {
-            // 规避死循环危险：如果超过延伸距离，放置时直接以物品形式掉落，而不是产生会转化为方块的沙子实体
+            // 规避死循环危险：如果超过延伸距离，放置时直接以物品形式掉落
             if (!world.isRemote) {
                 world.spawnEntity(new EntityItem(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(this)));
             }
@@ -120,11 +119,6 @@ public class BlockScaffolding extends Block {
         } else {
             return this.getDefaultState().withProperty(DISTANCE, distance).withProperty(BOTTOM, this.isBottomScaffolding(world, pos));
         }
-    }
-
-    @Override
-    public boolean canCreatureSpawn(IBlockState state, IBlockAccess world, BlockPos pos, EntityLiving.SpawnPlacementType type) {
-        return false;
     }
 
     @Override
@@ -173,7 +167,7 @@ public class BlockScaffolding extends Block {
         if (entityIn != null) {
             if (state.getValue(BOTTOM)) {
                 if (entityIn.posY >= (double)pos.getY() + 1.0F && !entityIn.isSneaking() && entityIn.motionY <= 0.0F) {
-                    super.addCollisionBoxToList(pos, entityBox, collidingBoxes, COLLISION_BOX); // 修复：显式调用父类方法
+                    super.addCollisionBoxToList(pos, entityBox, collidingBoxes, COLLISION_BOX);
                 }
                 if (entityIn.posY >= (double)pos.getY() && entityIn.motionY <= 0.0F) {
                     super.addCollisionBoxToList(pos, entityBox, collidingBoxes, COLLISION_BOX_BOTTOM);
@@ -197,12 +191,11 @@ public class BlockScaffolding extends Block {
                     }
                 }
 
-                // 修复：替换 Keyboard 纯客户端检测，使用反射安全获取双端通用的跳跃状态字段
                 boolean isJumping = false;
                 try {
                     isJumping = isJumpingField.getBoolean(player);
                 } catch (IllegalAccessException e) {
-                    // 反射失败时的降级方案
+                    // 反射异常处理
                 }
 
                 if (player.isSneaking()) {
@@ -213,7 +206,6 @@ public class BlockScaffolding extends Block {
                     player.motionY = 0.2F;
                     player.fallDistance = 0.0F;
                 } else {
-                    // 处于脚手架内部时提供轻微浮空与慢速下滑阻力
                     player.motionY *= 0.5F;
                     if (player.motionY < -0.15) {
                         player.motionY = -0.15;
@@ -249,7 +241,6 @@ public class BlockScaffolding extends Block {
 
     private int getDistance(World world, BlockPos pos) {
         if (world.getBlockState(pos.down()).isFullBlock() || world.getBlockState(pos.down()).getBlock() == this) {
-            // 如果下方是实心方块或者是另一个脚手架，垂直链上的垂直距离为0
             if (world.getBlockState(pos.down()).getBlock() == this) {
                 return world.getBlockState(pos.down()).getValue(DISTANCE);
             }
@@ -335,7 +326,6 @@ public class BlockScaffolding extends Block {
                     }
                     return true;
                 } else if (facing != EnumFacing.UP) {
-                    // 修复：将引用的 ModBlocks.SCAFFOLDING 替换为通用的 this，保证动态注册正确性
                     while (worldIn.getBlockState(pos.up()).getBlock() == this) {
                         pos = pos.up();
                         if (pos.getY() > 255) {
@@ -358,7 +348,6 @@ public class BlockScaffolding extends Block {
                     EnumFacing playerFacing = playerIn.getHorizontalFacing();
                     int length = 1;
 
-                    // 修复：替换为 this
                     while (worldIn.getBlockState(pos).getBlock() == this) {
                         pos = pos.offset(playerFacing);
                         length++;
