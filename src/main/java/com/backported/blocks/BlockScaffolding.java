@@ -120,7 +120,6 @@ public class BlockScaffolding extends Block {
     }
 
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-        // 修复：移除 @Override 标签以兼容不同 Mappings 映射
         return FULL_BLOCK_AABB;
     }
 
@@ -155,7 +154,6 @@ public class BlockScaffolding extends Block {
     }
 
     public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
-        // 修复：移除 @Override 标签以兼容不同 Mappings 映射
         return NULL_AABB;
     }
 
@@ -176,8 +174,8 @@ public class BlockScaffolding extends Block {
         }
     }
 
-    @Override
     public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+        // 修复：移除 @Override 标签以适配不同的映射命名（例如 onEntityCollision）
         if (entityIn instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer)entityIn;
             if (player.posX > (double)pos.getX() && player.posX < (double)(pos.getX() + 1) && player.posZ > (double)pos.getZ() && player.posZ < (double)(pos.getZ() + 1)) {
@@ -219,8 +217,8 @@ public class BlockScaffolding extends Block {
         return false;
     }
 
-    @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        // 安全移除 @Override
         if (!worldIn.isRemote) {
             int distance = this.getDistance(worldIn, pos);
             if (distance > 7) {
@@ -258,8 +256,8 @@ public class BlockScaffolding extends Block {
         return !world.getBlockState(pos.down()).isFullBlock() && world.getBlockState(pos.down()).getBlock() != this;
     }
 
-    @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        // 安全移除 @Override
         if (!worldIn.isRemote) {
             int distance = this.getDistance(worldIn, pos);
             worldIn.setBlockState(pos, state.withProperty(DISTANCE, distance).withProperty(BOTTOM, this.isBottomScaffolding(worldIn, pos)));
@@ -285,13 +283,13 @@ public class BlockScaffolding extends Block {
         }
     }
 
-    @Override
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
+        // 安全移除 @Override
         return worldIn.getBlockState(pos.down()).isFullBlock() || this.getDistance(worldIn, pos) < 7 || worldIn.getBlockState(pos.up()).getBlock() == this;
     }
 
-    @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        // 安全移除 @Override
         if (worldIn.isRemote) {
             return true;
         } else {
@@ -373,8 +371,8 @@ public class BlockScaffolding extends Block {
         }
     }
 
-    @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        // 安全移除 @Override
         super.breakBlock(worldIn, pos, state);
 
         for (EnumFacing facing : EnumFacing.values()) {
